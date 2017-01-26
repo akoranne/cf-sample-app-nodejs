@@ -1,0 +1,37 @@
+# pipeline for kill-java
+
+groups:
+- name: cf-nodejs
+  jobs:
+  - service-unit
+
+resources:
+- name: service-repo
+  type: git
+  source:
+    uri: https://github.com/akoranne/cf-sample-app-nodejs.git
+    branch: master
+- name: deploy-dev-env
+  type: cf
+  source:
+    api:             {{pws-api}}
+    username:        {{deploy-username}}
+    password:        {{deploy-password}}
+    skip_cert_check: true
+    organization:    {{pws-organization}}
+    space:           {{pws-staging-space}}
+
+jobs:
+- name: service-unit
+  public: true
+  serial: true
+  plan:
+  - get: service-repo
+    trigger: true
+  - task: CreateArchive
+    privileged: true
+    file: service-repo/ci/buildUnit.yml
+  - put: deploy-dev-env
+    params:
+      manifest: service-repo/manifest.yml
+      path: service-repo
