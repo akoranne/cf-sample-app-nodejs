@@ -42,19 +42,6 @@ jobs:
       run:
         path: npm
         args: [ install ]
-  - task: npm-test
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source: {repository: node, tag: "6" }
-      inputs:
-        - name: source-repo
-          path: .
-        - name: node_modules
-      run:
-        path: npm
-        args: [ test ]
   - put: deploy-dev-env
     params:
       manifest: source-repo/manifest.yml
